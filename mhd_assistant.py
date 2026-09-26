@@ -3,6 +3,8 @@ import requests
 from datetime import datetime
 from rich.console import Console
 from rich.table import Table
+from rich.panel import Panel
+from rich.align import Align
 
 console = Console()
 
@@ -13,15 +15,23 @@ class MHDAssistant:
         self.division = "Muslim Hacker Division"
 
     def get_ascii_banner(self):
-        # Banner dibuat ramping agar tidak pecah di layar kecil
+        # Banner modern dengan efek gradient dan styling
         banner = """
-  __  __ _   _ ____  
- |  \/  | | | |  _ \ 
- | |\/| | |_| | | | |
- | |  | |  _  | |_| |
- |_|  |_|_| |_|____/ 
+╔═══════════════════════════════════════╗
+║                                       ║
+║    ███╗   ███╗██╗  ██╗██████╗      ║
+║    ████╗ ████║██║  ██║██╔══██╗     ║
+║    ██╔████╔██║███████║██║  ██║     ║
+║    ██║╚██╔╝██║██╔══██║██║  ██║     ║
+║    ██║ ╚═╝ ██║██║  ██║██████╔╝     ║
+║    ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝      ║
+║                                       ║
+║  🕌 Muslim Hacker Division 🕌         ║
+║  Surabaya Islamic Tech Community      ║
+║                                       ║
+╚═══════════════════════════════════════╝
         """
-        return f"[bold green]{banner}[/bold green]\n[bold white]{self.division}[/bold white]"
+        return banner
 
     def get_sholat_schedule(self):
         try:
@@ -29,32 +39,67 @@ class MHDAssistant:
             response = requests.get(url).json()
             timings = response['data']['timings']
             
-            # Tabel tanpa kotak (box=None) agar lurus di terminal kecil
-            table = Table(box=None, padding=(0, 2))
-            table.add_column("Ibadah", style="cyan")
-            table.add_column("Waktu", style="bold yellow")
+            # Tabel dengan styling modern
+            table = Table(box=None, padding=(0, 2), show_header=True, header_style="bold magenta")
+            table.add_column("🕐 Ibadah", style="cyan")
+            table.add_column("⏰ Waktu", style="bold yellow")
+            
+            sholat_icons = {
+                'Fajr': '🌅 Subuh',
+                'Dhuhr': '☀️  Dzuhur',
+                'Asr': '🌤️  Ashar',
+                'Maghrib': '🌅 Maghrib',
+                'Isha': '🌙 Isya'
+            }
             
             for sholat in ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']:
-                table.add_row(sholat, timings[sholat])
+                table.add_row(sholat_icons[sholat], timings[sholat])
             return table
         except:
-            return "[bold red]Gagal koneksi, Bang![/bold red]"
+            return "[bold red]❌ Gagal koneksi, Bang![/bold red]"
 
     def run(self):
         os.system('clear' if os.name == 'posix' else 'cls')
-        # Cetak Banner tanpa Panel kotak
-        console.print(self.get_ascii_banner())
         
-        console.print(f"\n[bold green][+][/bold green] Status: [bold cyan]ONLINE[/bold cyan]")
-        console.print("-" * 25) # Garis pembatas manual
+        # Cetak Banner dengan Panel modern
+        banner_text = self.get_ascii_banner()
+        panel = Panel(
+            banner_text,
+            style="bold cyan",
+            border_style="bright_cyan",
+            padding=(1, 2)
+        )
+        console.print(panel)
+        
+        # Status line dengan animasi
+        status_line = "[bold green]✓[/bold green] Status: [bold cyan]ONLINE[/bold cyan] | [bold yellow]⚡ Ready[/bold yellow]"
+        console.print(Align.center(status_line))
+        
+        # Divider modern
+        console.print("[bright_cyan]" + "═" * 50 + "[/bright_cyan]")
+        
+        # Jadwal Sholat
+        console.print("\n[bold magenta]📍 Jadwal Sholat - Surabaya[/bold magenta]\n")
         console.print(self.get_sholat_schedule())
-        console.print("-" * 25)
         
-        # Dalil dengan manual wrap (\n) agar tidak nabrak pinggir layar
-        dalil = "[italic green]\"Sesungguhnya shalat itu adalah fardhu yang\nditentukan waktunya atas orang-orang yang beriman.\"\n(QS. An-Nisa: 103)[/italic green]"
-        console.print(f"\n{dalil}")
+        # Divider
+        console.print("\n[bright_cyan]" + "═" * 50 + "[/bright_cyan]")
         
-        console.print("\n[bold white][0] Exit System[/bold white]")
+        # Dalil dengan styling lebih bagus
+        dalil = """
+[bold green]📖 Dalil Al-Qur'an[/bold green]
+[italic cyan]"Sesungguhnya shalat itu adalah fardhu yang
+ditentukan waktunya atas orang-orang yang beriman."
+(QS. An-Nisa: 103)[/italic cyan]
+        """
+        console.print(dalil)
+        
+        # Footer dengan informasi
+        footer = "[bold white]───────────────────────────────────────────────[/bold white]\n"
+        footer += "[dim]Developed by: Bang MHD | Muslim Hacker Division[/dim]\n"
+        footer += "[bold white]───────────────────────────────────────────────[/bold white]\n"
+        footer += "[bold yellow][0][/bold yellow] [bold white]Exit System[/bold white]"
+        console.print(footer)
 
 if __name__ == "__main__":
     app = MHDAssistant()
